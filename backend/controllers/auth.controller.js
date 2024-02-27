@@ -1,34 +1,32 @@
 import bcrypt from "bcryptjs";
+import asyncHandler from "express-async-handler";
 import User from "../models/user.model.js";
 import generateTokenAndSetCookie from "../utils/generateTokens.js";
 
-export const signup = async (req, res) => {
+export const signup = asyncHandler(async (req, res) => {
   try {
-    const { fullname, username, password, confirmPassword, gender } = req.body;
-
-    if (password !== confirmPassword) {
-      return res.status(400).json({ error: "Passwords don't match" });
+    const { name, email, password, pic } = req.body;
+    if (!name || !email || !password) {
+      res.status(400);
+      throw new Error("Please enter all the Fields");
     }
-    const user = await User.findOne({ username });
-    if (user) {
-      return res.status(400).json({ error: "Username already exists" });
+
+    const userExists = await User.findOne({ email });
+    if (userExists) {
+      res.status(400);
+      throw new Error("Username already exists");
     }
 
     //Hash Password here using bcryptjs
     const salt = bcrypt.genSaltSync(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    //avatar-placeholder.iran.liara.run/
-    const boyProfilePic = `https://avatar.iran.liara.run/public/boy?username=${username}`;
-    const girlProfilePic = `https://avatar.iran.liara.run/public/girl?username=${username}`;
-
+    //creating new User
     const newUser = new User({
-      //fullname:fullname,
-      fullname,
-      username,
+      name,
+      email,
       password: hashedPassword,
-      gender,
-      profilePic: gender === "male" ? boyProfilePic : girlProfilePic,
+      pic,
     });
 
     if (newUser) {
@@ -39,42 +37,48 @@ export const signup = async (req, res) => {
 
       res.status(201).json({
         _id: newUser._id,
-        fullname: newUser.fullname,
-        username: newUser.username,
-        profilePic: newUser.profilePic,
+        name: newUser.name,
+        email: newUser.email,
+        pic: newUser.profilePic,
       });
     } else {
-      res.Status(400).json({ error: "Invalid user data" });
+      res.Status(400);
+      throw Error("Invalid user data");
     }
   } catch (error) {
     console.log("Error in Signup Controller", error.message);
     res.status(500).json({ error: "Internal Server Error" });
   }
-};
+});
 
-export const login = async (req, res) => {
+export const login = asyncHandler(async (req, res) => {
   try {
-    const { username, password } = req.body;
-    const user = await User.findOne({ username });
-    if (!user) return res.status(401).json({ error: "Invalid Username" });
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
+    if (!user) {
+      res.status(401);
+      throw Error("Invalid Username");
+    }
     const isPasswordCorect = await bcrypt.compare(password, user.password);
     if (!isPasswordCorect) {
-      return res.status(401).json({ error: "Wrong Password!" });
+      res.status(401);
+      throw Error("Wrong Password!");
     }
+
     //JWT token generation and setting cookie
     generateTokenAndSetCookie(user._id, res);
 
     res.status(200).json({
       _id: user._id,
-      fullname: user.fullname,
-      username: user.username,
-      profilePic: user.profilePic,
+      name: user.name,
+      email: user.email,
+      pic: user.pic,
     });
   } catch (error) {
     console.log("Error in Login Controller", error.message);
     res.status(500).json({ error: "Internal Server Error" });
   }
-};
+});
 
 export const logout = (req, res) => {
   try {

@@ -2,9 +2,12 @@ import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import express from "express";
 
-import connectToMongoDB from "../db/connnectToMongoDB.js";
 import authRoutes from "./routes/auth.route.js";
 import messageRoutes from "./routes/message.route.js";
+import userRoutes from "./routes/user.route.js";
+
+import connectToMongoDB from "../db/connnectToMongoDB.js";
+import { errorHandler, notFound } from "./middleware/errorMiddleware.js";
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -16,11 +19,10 @@ app.use(cookieParser()); // to get cookies from req.cookie.jwt, used for authent
 
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);
+app.use("/api/users", userRoutes);
 
-// app.get("/", (req, res) => {
-//   //root route http://localhost:5000/
-//   res.send("Hello World!!");
-// });
+app.use(notFound);
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   connectToMongoDB();

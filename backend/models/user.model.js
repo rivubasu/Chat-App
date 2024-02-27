@@ -2,29 +2,24 @@ import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema(
   {
-    fullname: {
+    name: {
       type: String,
       required: true,
     },
-    username: {
+    email: {
       type: String,
-      required: true,
       unique: true,
-      minlength: 6,
+      required: true,
     },
     password: {
       type: String,
       required: true,
       minlength: 6,
     },
-    gender: {
+    pic: {
       type: String,
-      required: true,
-      enum: ["male", "female"],
-    },
-    profilePic: {
-      type: String,
-      default: "",
+      default:
+        "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
     },
   },
   //createdAt, updatedAt => Member Since <createdAt> <date>
