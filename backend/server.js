@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import express from "express";
 
 import authRoutes from "./routes/auth.route.js";
-import messageRoutes from "./routes/message.route.js";
+import chatRoutes from "./routes/chat.route.js";
 import userRoutes from "./routes/user.route.js";
 
 import connectToMongoDB from "../db/connnectToMongoDB.js";
@@ -18,7 +18,7 @@ app.use(express.json()); //to parse incoming request from jason payload (from re
 app.use(cookieParser()); // to get cookies from req.cookie.jwt, used for authentication
 
 app.use("/api/auth", authRoutes);
-app.use("/api/messages", messageRoutes);
+app.use("/api/chat", chatRoutes);
 app.use("/api/users", userRoutes);
 
 app.use(notFound);
