@@ -9,7 +9,7 @@ import {
   VStack,
 } from "@chakra-ui/react";
 import axios from "axios";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { BiSolidHide } from "react-icons/bi";
 import { FaRegEye } from "react-icons/fa";
 import { useHistory } from "react-router-dom";
@@ -24,6 +24,16 @@ const Login = () => {
 
   const [GuestEmail, setGuestEmail] = useState();
   const [GuestPassword, setGuestPassword] = useState();
+
+  const [shouldRefresh, setShouldRefresh] = useState(false);
+  useEffect(() => {
+    if (shouldRefresh) {
+      // Refresh the page
+      window.location.reload();
+      // Set the state to prevent further refreshes
+      setShouldRefresh(false);
+    }
+  }, [shouldRefresh]);
 
   const handleClick = () => setShow(!show);
 
@@ -55,17 +65,21 @@ const Login = () => {
         { email, password },
         config
       );
+      localStorage.setItem("userInfo", JSON.stringify(data));
       toast({
         title: "Login Successful.",
         status: "success",
-        duration: 5000,
+        duration: 1000,
         isClosable: true,
         position: "bottom",
       });
-      localStorage.setItem("userInfo", JSON.stringify(data));
 
-      setLoading(false);
-      history.push("/chats");
+      setTimeout(() => {
+        setLoading(false);
+
+        history.push("/chats");
+        setShouldRefresh(true);
+      }, 1000);
     } catch (error) {
       toast({
         title: "Error Occured!",
