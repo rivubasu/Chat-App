@@ -52,6 +52,7 @@ function SideDrawer() {
 
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem("userInfo"));
+    console.log("Stored User:", storedUser); // Check the stored user information
     if (storedUser) {
       setUser(storedUser);
     }
@@ -60,6 +61,17 @@ function SideDrawer() {
   const logoutHandler = async () => {
     axios.post("/api/auth/logout");
     localStorage.removeItem("userInfo");
+
+    toast({
+      title: "Logout Successful.",
+      status: "success",
+      duration: 1000,
+      isClosable: true,
+      position: "bottom",
+    });
+
+    setSelectedChat(undefined);
+    setChats([]);
     history.push("/");
   };
 

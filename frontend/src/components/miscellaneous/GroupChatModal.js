@@ -1,23 +1,23 @@
 import {
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  ModalCloseButton,
+  Box,
   Button,
-  useDisclosure,
   FormControl,
   Input,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  useDisclosure,
   useToast,
-  Box,
 } from "@chakra-ui/react";
 import axios from "axios";
 import { useState } from "react";
-import { ChatState } from "../../Context/ChatProvider";
-import UserBadgeItem from "../userAvatar/UserBadgeItem";
-import UserListItem from "../userAvatar/UserListItem";
+import { ChatState } from "../../Context/ChatProvider.js";
+import UserBadgeItem from "../UserAvatar/UserBadgeItem.js";
+import UserListItem from "../UserAvatar/UserListItem.js";
 
 const GroupChatModal = ({ children }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -28,12 +28,15 @@ const GroupChatModal = ({ children }) => {
   const [loading, setLoading] = useState(false);
   const toast = useToast();
 
-  const { user, chats, setChats } = ChatState();
+  const { chats, setChats } = ChatState();
 
   const handleGroup = (userToAdd) => {
-    if (selectedUsers.includes(userToAdd)) {
+    const selectedUserIds = selectedUsers.map((user) => String(user._id));
+    const userToAddId = String(userToAdd._id);
+    // if (selectedUsers.includes(userToAdd))
+    if (selectedUserIds.includes(userToAddId)) {
       toast({
-        title: "User already added",
+        title: "User added already",
         status: "warning",
         duration: 5000,
         isClosable: true,
@@ -53,12 +56,7 @@ const GroupChatModal = ({ children }) => {
 
     try {
       setLoading(true);
-      const config = {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      };
-      const { data } = await axios.get(`/api/user?search=${search}`, config);
+      const { data } = await axios.get(`/api/users?search=${search}`);
       console.log(data);
       setLoading(false);
       setSearchResult(data);
@@ -91,19 +89,10 @@ const GroupChatModal = ({ children }) => {
     }
 
     try {
-      const config = {
-        headers: {
-          Authorization: `Bearer ${user.token}`,
-        },
-      };
-      const { data } = await axios.post(
-        `/api/chat/group`,
-        {
-          name: groupChatName,
-          users: JSON.stringify(selectedUsers.map((u) => u._id)),
-        },
-        config
-      );
+      const { data } = await axios.post("/api/chat/group", {
+        name: groupChatName,
+        users: JSON.stringify(selectedUsers.map((u) => u._id)),
+      });
       setChats([data, ...chats]);
       onClose();
       toast({
@@ -135,13 +124,13 @@ const GroupChatModal = ({ children }) => {
           <ModalHeader
             fontSize="35px"
             fontFamily="Work sans"
-            d="flex"
+            display="flex"
             justifyContent="center"
           >
             Create Group Chat
           </ModalHeader>
           <ModalCloseButton />
-          <ModalBody d="flex" flexDir="column" alignItems="center">
+          <ModalBody display="flex" flexDir="column" alignItems="center">
             <FormControl>
               <Input
                 placeholder="Chat Name"
@@ -151,12 +140,13 @@ const GroupChatModal = ({ children }) => {
             </FormControl>
             <FormControl>
               <Input
-                placeholder="Add Users eg: John, Piyush, Jane"
+                placeholder="Add Users eg: Simran, Piyush, Ramesh"
                 mb={1}
                 onChange={(e) => handleSearch(e.target.value)}
               />
             </FormControl>
-            <Box w="100%" d="flex" flexWrap="wrap">
+            {/*Selected users*/}
+            <Box w="100%" display="flex" flexWrap="wrap">
               {selectedUsers.map((u) => (
                 <UserBadgeItem
                   key={u._id}
@@ -165,12 +155,13 @@ const GroupChatModal = ({ children }) => {
                 />
               ))}
             </Box>
+            {/*Rendering Searched users*/}
             {loading ? (
               // <ChatLoading />
               <div>Loading...</div>
             ) : (
               searchResult
-                ?.slice(0, 4)
+                ?.slice(0, 4) //displaying top 4 searched results
                 .map((user) => (
                   <UserListItem
                     key={user._id}
@@ -181,7 +172,7 @@ const GroupChatModal = ({ children }) => {
             )}
           </ModalBody>
           <ModalFooter>
-            <Button onClick={handleSubmit} colorScheme="blue">
+            <Button onClick={handleSubmit} colorScheme="teal">
               Create Chat
             </Button>
           </ModalFooter>

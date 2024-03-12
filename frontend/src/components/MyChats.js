@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { ChatState } from "../Context/ChatProvider";
 import { getSender } from "../config/ChatLogics";
 import ChatLoading from "./ChatLoading";
+import GroupChatModal from "./miscellaneous/GroupChatModal";
 
 const MyChats = ({ fetchAgain }) => {
   const [user, setUser] = useState(
@@ -19,6 +20,7 @@ const MyChats = ({ fetchAgain }) => {
   }, []);
 
   const [loggedUser, setLoggedUser] = useState();
+  const [loadingChat, setLoadingChat] = useState(false);
   const { selectedChat, setSelectedChat, chats, setChats } = ChatState();
 
   const toast = useToast();
@@ -26,8 +28,10 @@ const MyChats = ({ fetchAgain }) => {
   const fetchChats = async () => {
     // console.log(user._id);
     try {
+      setLoadingChat(true);
       const { data } = await axios.get("/api/chat");
       setChats(data);
+      setLoadingChat(false);
     } catch (error) {
       toast({
         title: "Error Occured!",
@@ -44,7 +48,7 @@ const MyChats = ({ fetchAgain }) => {
     setLoggedUser(JSON.parse(localStorage.getItem("userInfo")));
     fetchChats();
     // eslint-disable-next-line
-  }, []);
+  }, [fetchAgain]);
 
   return (
     <Box
@@ -68,13 +72,15 @@ const MyChats = ({ fetchAgain }) => {
         alignItems="center"
       >
         My Chats
-        <Button
-          display="flex"
-          fontSize={{ base: "17px", md: "10px", lg: "17px" }}
-          rightIcon={<AddIcon />}
-        >
-          New Group Chat
-        </Button>
+        <GroupChatModal>
+          <Button
+            display="flex"
+            fontSize={{ base: "17px", md: "10px", lg: "17px" }}
+            rightIcon={<AddIcon />}
+          >
+            New Group Chat
+          </Button>
+        </GroupChatModal>
       </Box>
       <Box
         display="flex"
@@ -86,9 +92,11 @@ const MyChats = ({ fetchAgain }) => {
         borderRadius="lg"
         overflowY="hidden"
       >
-        {chats ? (
+        {loadingChat ? (
+          <ChatLoading />
+        ) : (
           <Stack overflowY="scroll">
-            {chats.map((chat) => (
+            {chats?.map((chat) => (
               <Box
                 onClick={() => setSelectedChat(chat)}
                 cursor="pointer"
@@ -115,8 +123,6 @@ const MyChats = ({ fetchAgain }) => {
               </Box>
             ))}
           </Stack>
-        ) : (
-          <ChatLoading />
         )}
       </Box>
     </Box>

@@ -134,41 +134,84 @@ export const renameGroup = asyncHandler(async (req, res) => {
 // @desc    Remove user from Group
 // @route   PUT /api/chat/groupremove
 // @access  Protected
+// export const removeFromGroup = asyncHandler(async (req, res) => {
+//   const { chatId, userId } = req.body;
+
+//   // check if the requester is admin
+//   const loggedInUser = req.user._id;
+//   const groupUserHaveToBeAdded = await Chat.findOne({ _id: { $eq: chatId } });
+//   if (!groupUserHaveToBeAdded) {
+//     res.status(404);
+//     throw new Error("This chat does not exist");
+//   }
+//   const admin = groupUserHaveToBeAdded.groupAdmin;
+//   if (admin.toString() !== loggedInUser.toString()) {
+//     res.status(401);
+//     throw new Error("You are not the Group Admin");
+//   }
+
+//   //NOW REMOVE THE MEMBER FROM GROUP
+//   const removed = await Chat.findByIdAndUpdate(
+//     chatId,
+//     {
+//       $pull: { users: userId },
+//     },
+//     {
+//       new: true,
+//     }
+//   )
+//     .populate("users", "-password")
+//     .populate("groupAdmin", "-password");
+
+//   if (!removed) {
+//     res.status(404);
+//     throw new Error("Chat Not Found");
+//   } else {
+//     res.json(removed);
+//   }
+// });
+
+//MADE BY ME
 export const removeFromGroup = asyncHandler(async (req, res) => {
   const { chatId, userId } = req.body;
 
-  // check if the requester is admin
-  const loggedInUser = req.user._id;
-  const groupUserHaveToBeAdded = await Chat.findOne({ _id: { $eq: chatId } });
-  if (!groupUserHaveToBeAdded) {
+  // Check if the chat exists
+  const groupChat = await Chat.findById(chatId);
+  if (!groupChat) {
     res.status(404);
-    throw new Error("This chat does not exist");
-  }
-  const admin = groupUserHaveToBeAdded.groupAdmin;
-  if (admin.toString() !== loggedInUser.toString()) {
-    res.status(401);
-    throw new Error("You are not the Group Admin");
+    throw new Error("Chat not found");
   }
 
-  //NOW REMOVE THE MEMBER FROM GROUP
-  const removed = await Chat.findByIdAndUpdate(
-    chatId,
-    {
-      $pull: { users: userId },
-    },
-    {
-      new: true,
-    }
-  )
-    .populate("users", "-password")
-    .populate("groupAdmin", "-password");
+  // Check if the user to be removed is a member of the chat
+  const userToRemoveId = userId.toString();
+  // if (!groupChat.users.includes(userToRemoveId)) {
+  //   res.status(400);
+  //   throw new Error("User is not a member of this chat");
+  // }
 
-  if (!removed) {
-    res.status(404);
-    throw new Error("Chat Not Found");
-  } else {
-    res.json(removed);
+  // If the user is removing themselves, or if the requester is the admin of the group, allow removal
+  if (
+    userToRemoveId === req.user._id.toString() ||
+    groupChat.groupAdmin.toString() === req.user._id.toString()
+  ) {
+    // Remove the user from the group
+    const updatedChat = await Chat.findByIdAndUpdate(
+      chatId,
+      {
+        $pull: { users: userToRemoveId },
+      },
+      {
+        new: true,
+      }
+    )
+      .populate("users", "-password")
+      .populate("groupAdmin", "-password");
+
+    return res.json(updatedChat);
   }
+
+  res.status(401);
+  throw new Error("You are not not the admin");
 });
 
 // @desc    Add user to Group / Leave

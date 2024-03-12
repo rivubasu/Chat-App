@@ -118,16 +118,18 @@ const Signup = () => {
         config
       );
       toast({
-        title: "Registration Successful.",
+        title: "Registration Successful. Proceed to Login",
         status: "success",
         duration: 5000,
         isClosable: true,
         position: "bottom",
       });
-      localStorage.setItem("userInfo", JSON.stringify(data));
 
       setLoading(false);
-      history.push("/chats");
+
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
     } catch (error) {
       toast({
         title: "Error Occured!",

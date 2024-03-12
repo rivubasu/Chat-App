@@ -16,6 +16,6 @@ router.get("/", protectRoute, fetchChats);
 router.post("/group", protectRoute, createGroupChat);
 router.put("/rename", protectRoute, renameGroup);
 router.put("/groupremove", protectRoute, removeFromGroup);
-router.put("/groupradd", protectRoute, addToGroup);
+router.put("/groupadd", protectRoute, addToGroup);
 
 export default router;
