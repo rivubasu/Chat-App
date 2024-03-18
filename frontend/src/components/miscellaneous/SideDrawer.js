@@ -28,7 +28,9 @@ import { IoIosNotifications } from "react-icons/io";
 import { useHistory } from "react-router-dom";
 //import { ChatState } from "../../Context/ChatProvider";
 import { MdOutlineTransitEnterexit } from "react-icons/md";
+import NotificationBadge, { Effect } from "react-notification-badge";
 import { ChatState } from "../../Context/ChatProvider.js";
+import { getSender } from "../../config/ChatLogics.js";
 import ChatLoading from "../ChatLoading.js";
 import UserListItem from "../UserAvatar/UserListItem.js";
 import ProfileModal from "./ProfileModal.js";
@@ -166,10 +168,31 @@ function SideDrawer() {
         <div>
           <Menu>
             <MenuButton p={1}>
+              <NotificationBadge
+                count={notification.length}
+                effect={Effect.SCALE}
+              />
               <IoIosNotifications
                 style={{ fontSize: "30px", margin: "2px 1px 1px 1px" }}
               />
             </MenuButton>
+            <MenuList pl={2}>
+              {/* <NotificationItem /> */}
+              {!notification.length && "No New Message"}
+              {notification.map((notif) => (
+                <MenuItem
+                  key={notification._id}
+                  onClick={() => {
+                    setSelectedChat(notif.chat);
+                    setNotification(notification.filter((n) => n !== notif));
+                  }}
+                >
+                  {notif.chat.isGroupChat
+                    ? `New Message in ${notif.chat.chatName}`
+                    : `New Message from ${getSender(user, notif.chat.users)}`}
+                </MenuItem>
+              ))}
+            </MenuList>
           </Menu>
           <Menu>
             <MenuButton
