@@ -12,10 +12,14 @@ const Chatbox = ({ fetchAgain, setFetchAgain }) => {
       alignItems="center"
       flexDir="column"
       p={3}
-      bg="white"
+      //bg="white"
       width={{ base: "100%", md: "68%" }}
       borderRadius="lg"
       borderWidth="1px"
+      bg="rgba(228, 181, 174, 0.22)" // Setting background color with transparency
+      backdropFilter="blur(20px)" // Applying backdrop filter with blur
+      borderColor="rgba(255,255,255,0.3)" // Setting border color with transparency
+      boxShadow="0 1px 12px rgba(0,0,0,0.25)" // Adding box shadow
     >
       <SingleChat fetchAgain={fetchAgain} setFetchAgain={setFetchAgain} />
     </Box>

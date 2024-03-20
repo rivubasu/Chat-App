@@ -49,11 +49,15 @@ export const Homepage = () => {
         borderRadius="lg"
         color="black"
         borderWidth="1px"
+        //bg="rgba(255,255,255,0.5)" // Setting background color with transparency
+        backdropFilter="blur(20px)" // Applying backdrop filter with blur
+        borderColor="rgba(255,255,255,0.3)" // Setting border color with transparency
+        boxShadow="0 1px 12px rgba(0,0,0,0.25)" // Adding box shadow
       >
         <Tabs variant="soft-rounded">
           <TabList mb="1em">
             <Tab width="50%">Login</Tab>
-            <Tab width="50%">Sign Up</Tab>
+            <Tab width="50%">Register</Tab>
           </TabList>
           <TabPanels>
             <TabPanel>

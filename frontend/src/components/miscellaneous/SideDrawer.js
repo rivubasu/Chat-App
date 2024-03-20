@@ -27,7 +27,6 @@ import { GoChevronDown } from "react-icons/go";
 import { IoIosNotifications } from "react-icons/io";
 import { useHistory } from "react-router-dom";
 //import { ChatState } from "../../Context/ChatProvider";
-import { MdOutlineTransitEnterexit } from "react-icons/md";
 import NotificationBadge, { Effect } from "react-notification-badge";
 import { ChatState } from "../../Context/ChatProvider.js";
 import { getSender } from "../../config/ChatLogics.js";
@@ -79,17 +78,18 @@ function SideDrawer() {
 
   const toast = useToast();
 
-  const handleSearch = async () => {
-    if (!search) {
-      toast({
-        title: "Please Enter something in search",
-        status: "warning",
-        duration: 5000,
-        isClosable: true,
-        position: "top-left",
-      });
-      return;
-    }
+  const handleSearch = async (e) => {
+    setSearch(e.target.value);
+    // if (!search) {
+    //   toast({
+    //     title: "Please Enter something in search",
+    //     status: "warning",
+    //     duration: 5000,
+    //     isClosable: true,
+    //     position: "top-left",
+    //   });
+    //   return;
+    // }
 
     try {
       setLoading(true);
@@ -155,7 +155,14 @@ function SideDrawer() {
           hasArrow="true"
           placement="bottom-end"
         >
-          <Button variant="ghost" onClick={onOpen}>
+          <Button
+            variant="variant"
+            onClick={onOpen}
+            bg="rgba(104, 218, 243, 0.42)" // Setting background color with transparency
+            backdropFilter="blur(20px)" // Applying backdrop filter with blur
+            borderColor="rgba(255,255,255,0.3)" // Setting border color with transparency
+            boxShadow="0 1px 12px rgba(0,0,0,0.25)" // Adding box shadow
+          >
             <FaSearch />
             <Text display={{ base: "none", md: "flex" }} px={4}>
               Search User
@@ -163,7 +170,7 @@ function SideDrawer() {
           </Button>
         </Tooltip>
         <Text fontSize="2xl" fontFamily="Work sans">
-          Chatify
+          <b>Chatify</b>
         </Text>
         <div>
           <Menu>
@@ -228,11 +235,11 @@ function SideDrawer() {
                 placeholder="Search by name or email"
                 mr={2}
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={(e) => handleSearch(e)}
               />
-              <Button onClick={handleSearch}>
+              {/* <Button>
                 <MdOutlineTransitEnterexit fontSize="30px" />
-              </Button>
+              </Button> */}
             </Box>
             {loading ? (
               <ChatLoading />

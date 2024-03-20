@@ -10,6 +10,7 @@ import {
   ModalFooter,
   ModalHeader,
   ModalOverlay,
+  Spinner,
   useDisclosure,
   useToast,
 } from "@chakra-ui/react";
@@ -127,13 +128,13 @@ const GroupChatModal = ({ children }) => {
             display="flex"
             justifyContent="center"
           >
-            Create Group Chat
+            Create Group
           </ModalHeader>
           <ModalCloseButton />
           <ModalBody display="flex" flexDir="column" alignItems="center">
             <FormControl>
               <Input
-                placeholder="Chat Name"
+                placeholder="Group Name"
                 mb={3}
                 onChange={(e) => setGroupChatName(e.target.value)}
               />
@@ -158,7 +159,7 @@ const GroupChatModal = ({ children }) => {
             {/*Rendering Searched users*/}
             {loading ? (
               // <ChatLoading />
-              <div>Loading...</div>
+              <Spinner />
             ) : (
               searchResult
                 ?.slice(0, 4) //displaying top 4 searched results
@@ -173,7 +174,7 @@ const GroupChatModal = ({ children }) => {
           </ModalBody>
           <ModalFooter>
             <Button onClick={handleSubmit} colorScheme="teal">
-              Create Chat
+              Create Group
             </Button>
           </ModalFooter>
         </ModalContent>

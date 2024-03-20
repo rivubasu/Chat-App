@@ -1,9 +1,9 @@
 import { AddIcon } from "@chakra-ui/icons";
-import { Box, Button, Stack, Text, useToast } from "@chakra-ui/react";
+import { Avatar, Box, Button, Stack, Text, useToast } from "@chakra-ui/react";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { ChatState } from "../Context/ChatProvider";
-import { getSender } from "../config/ChatLogics";
+import { getSender, getSenderFull } from "../config/ChatLogics";
 import ChatLoading from "./ChatLoading";
 import GroupChatModal from "./miscellaneous/GroupChatModal";
 
@@ -56,10 +56,13 @@ const MyChats = ({ fetchAgain }) => {
       flexDir="column"
       alignItems="center"
       p={3}
-      bg="white"
       width={{ base: "100%", md: "31%" }}
       borderRadius="lg"
       borderWidth="1px"
+      bg="rgba(228, 181, 174, 0.22)"
+      backdropFilter="blur(20px)" // Applying backdrop filter with blur
+      borderColor="rgba(255,255,255,0.3)" // Setting border color with transparency
+      boxShadow="0 1px 12px rgba(0,0,0,0.25)" // Adding box shadow
     >
       <Box
         pb={3}
@@ -71,14 +74,18 @@ const MyChats = ({ fetchAgain }) => {
         justifyContent="space-between"
         alignItems="center"
       >
-        My Chats
+        <b style={{ color: "white" }}>My Chats</b>
         <GroupChatModal>
           <Button
             display="flex"
             fontSize={{ base: "17px", md: "10px", lg: "17px" }}
             rightIcon={<AddIcon />}
+            bg="rgba(0, 248, 182, 0.7)" // Setting background color with transparency
+            backdropFilter="blur(20px)" // Applying backdrop filter with blur
+            borderColor="rgba(255,255,255,0.3)" // Setting border color with transparency
+            boxShadow="0 1px 12px rgba(0,0,0,0.25)" // Adding box shadow
           >
-            New Group Chat
+            Create Group
           </Button>
         </GroupChatModal>
       </Box>
@@ -86,11 +93,17 @@ const MyChats = ({ fetchAgain }) => {
         display="flex"
         flexDir="column"
         p={3}
-        bg="#F8F8F8"
+        //bg="#F8F8F8"
         width="100%"
         height="100%"
         borderRadius="lg"
         overflowY="hidden"
+        bg="rgba(0, 0, 0, 0)"
+        //bg="rgba(255, 0, 0, 0.03)"
+        //bg="rgba(255,255,255,0.5)" // Setting background color with transparency
+        backdropFilter="transparent(20px)" // Applying backdrop filter with blur
+        borderColor="rgba(255,255,255,0.3)" // Setting border color with transparency
+        boxShadow="0 1px 12px rgba(0,0,0,0.25)" // Adding box shadow
       >
         {loadingChat ? (
           <ChatLoading />
@@ -108,18 +121,27 @@ const MyChats = ({ fetchAgain }) => {
                 key={chat._id}
               >
                 <Text>
+                  {!chat.isGroupChat && (
+                    <Avatar
+                      marginRight={2}
+                      size="sm"
+                      cursor="pointer"
+                      name={getSenderFull(loggedUser, chat.users).name}
+                      src={getSenderFull(loggedUser, chat.users).pic}
+                    />
+                  )}
                   {!chat.isGroupChat
                     ? getSender(loggedUser, chat.users)
                     : chat.chatName}
                 </Text>
-                {/* {chat.latestMessage && (
+                {chat.latestMessage && (
                   <Text fontSize="xs">
                     <b>{chat.latestMessage.sender.name} : </b>
                     {chat.latestMessage.content.length > 50
                       ? chat.latestMessage.content.substring(0, 51) + "..."
                       : chat.latestMessage.content}
                   </Text>
-                )} */}
+                )}
               </Box>
             ))}
           </Stack>

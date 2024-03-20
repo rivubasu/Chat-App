@@ -123,6 +123,10 @@ const Login = () => {
         style={{ marginTop: 15 }}
         onClick={submitHandler}
         isLoading={loading}
+        //bg="rgba(242, 92, 250, 0.8)" // Setting background color with transparency
+        backdropFilter="blur(20px)" // Applying backdrop filter with blur
+        borderColor="rgba(255,255,255,0.3)" // Setting border color with transparency
+        boxShadow="0 1px 12px rgba(0,0,0,0.25)" // Adding box shadow
       >
         Login
       </Button>

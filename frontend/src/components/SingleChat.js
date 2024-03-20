@@ -1,6 +1,7 @@
 import { ArrowBackIcon } from "@chakra-ui/icons";
 import {
   Box,
+  Button,
   FormControl,
   IconButton,
   Input,
@@ -10,6 +11,7 @@ import {
 } from "@chakra-ui/react";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
+import { IoIosSend } from "react-icons/io";
 import Lottie from "react-lottie";
 import { io } from "socket.io-client";
 import { ChatState } from "../Context/ChatProvider";
@@ -129,6 +131,42 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
     }
   };
 
+  const sendMessageIcon = async () => {
+    if (newMessage) {
+      socket.emit("stop typing", selectedChat._id);
+
+      setNewMessage("");
+      try {
+        const config = {
+          headers: {
+            "Content-type": "application/json",
+          },
+        };
+
+        const { data } = await axios.post(
+          "/api/message",
+          {
+            content: newMessage,
+            chatId: selectedChat._id,
+          },
+          config
+        );
+
+        socket.emit("new message", data);
+        setMessages([...messages, data]);
+      } catch (error) {
+        toast({
+          title: "Error Occured!",
+          description: "Failed to send the Message",
+          status: "error",
+          duration: 5000,
+          isClosable: true,
+          position: "bottom",
+        });
+      }
+    }
+  };
+
   //fetch messages  whenever user selects a particular chat
   useEffect(() => {
     fetchMessages();
@@ -192,6 +230,7 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             display="flex"
             justifyContent={{ base: "space-between" }}
             alignItems="center"
+            color="white"
           >
             <IconButton //back icon  for going back to chats page only on for small screen
               display={{ base: "flex", md: "none" }} //base is for small screen and md for medium screen
@@ -200,13 +239,13 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             />
             {!selectedChat.isGroupChat ? ( //selected chat is not a group chat
               <>
-                {getSender(user, selectedChat.users)}
+                <b>{getSender(user, selectedChat.users)}</b>
                 <ProfileModal user={getSenderFull(user, selectedChat.users)} />
               </>
             ) : (
               <>
                 {/* Selected chat is a group chat              */}
-                {selectedChat.chatName.toUpperCase()}
+                <b>{selectedChat.chatName.toUpperCase()}</b>
                 <UpdateGroupChatModal
                   fetchMessages={fetchMessages}
                   fetchAgain={fetchAgain}
@@ -225,6 +264,10 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
             height="100%"
             borderRadius="lg"
             overflowY="hidden"
+            //bg="rgba(255,255,255,0.5)" // Setting background color with transparency
+            backdropFilter="blur(20px)" // Applying backdrop filter with blur
+            borderColor="rgba(255,255,255,0.3)" // Setting border color with transparency
+            boxShadow="0 1px 12px rgba(0,0,0,0.25)" // Adding box shadow
           >
             {loading ? (
               <Spinner
@@ -259,13 +302,28 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
               ) : (
                 <></>
               )}
-              <Input
-                variant="filled"
-                bg="#E0E0E0"
-                placeholder="Type a message.."
-                value={newMessage}
-                onChange={typingHandler}
-              />
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
+                <Input
+                  variant="filled"
+                  bg="#E0E0E0"
+                  placeholder="Type a message.."
+                  value={newMessage}
+                  onChange={typingHandler}
+                />
+                <Button
+                  onClick={sendMessageIcon}
+                  style={{ background: "#E0E0E0" }}
+                >
+                  <IoIosSend
+                    style={{
+                      marginRight: "4px",
+                      width: "25px",
+                      height: "unset",
+                      background: "#E0E0E0",
+                    }}
+                  />
+                </Button>
+              </div>
             </FormControl>
           </Box>
         </>
@@ -277,8 +335,8 @@ const SingleChat = ({ fetchAgain, setFetchAgain }) => {
           justifyContent="center"
           h="100%"
         >
-          <Text fontSize="3xl" pb={3} fontFamily="Work sans">
-            Click on a user to start chatting
+          <Text fontSize="3xl" pb={3} fontFamily="Work sans" color="white">
+            <b>Click on a user to start chatting</b>
           </Text>
         </Box>
       )}
