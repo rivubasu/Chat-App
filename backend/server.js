@@ -7,6 +7,7 @@ import chatRoutes from "./routes/chat.route.js";
 import messageRoutes from "./routes/message.route.js";
 import userRoutes from "./routes/user.route.js";
 
+import path from "path";
 import { Server } from "socket.io";
 import connectToMongoDB from "./db/connnectToMongoDB.js";
 import { errorHandler, notFound } from "./middleware/errorMiddleware.js";
@@ -23,6 +24,24 @@ app.use("/api/auth", authRoutes);
 app.use("/api/chat", chatRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/message", messageRoutes);
+
+// --------------------------deployment------------------------------
+
+const __dirname1 = path.resolve();
+
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname1, "/frontend/build")));
+
+  app.get("*", (req, res) =>
+    res.sendFile(path.resolve(__dirname1, "frontend", "build", "index.html"))
+  );
+} else {
+  app.get("/", (req, res) => {
+    res.send("API is running..");
+  });
+}
+
+// --------------------------deployment------------------------------
 
 app.use(notFound);
 app.use(errorHandler);
