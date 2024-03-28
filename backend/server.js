@@ -55,7 +55,8 @@ const server = app.listen(PORT, () => {
 const io = new Server(server, {
   pingTimeout: 60000, //it will close the connection after  60 secs  of inactivity from client side
   cors: {
-    origin: "http://localhost:3000",
+    //origin: "http://localhost:3000",
+    origin: "*",
     // credentials: true,
   },
 });
